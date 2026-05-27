@@ -8,9 +8,7 @@ body:
       value: |
         ## Welcome
 
-        Statlib is a Lean 4 library for formal probability, statistics, information theory, and stochastic methods in theoretical computer science.
-
-        Use this form for anything you would like the community to see &mdash; it does not have to be polished. Some examples of what fits here:
+         Use this form for anything you would like the community to see &mdash; it does not have to be polished. Some examples of what fits here:
 
         - **Questioning a definition or its generality.** "Why is `X` stated only for finite measures? Could it be stated for `σ`-finite ones?"
         - **Recommending a reference.** A textbook chapter, a paper, or a Mathlib file that handles a topic well.
@@ -18,8 +16,6 @@ body:
         - **Pointing to a related PR.** Either to Statlib, to Mathlib, or to another downstream library.
         - **Asking a question** about an existing entry, definition, or proof.
         - **Proposing a new definition or theorem** &mdash; sketches and informal drafts are welcome.
-
-        Don't worry about putting your submission in the "right" category &mdash; the fields below are guides, not requirements. Leave fields blank if they don't apply.
 
   - type: dropdown
     id: kind
