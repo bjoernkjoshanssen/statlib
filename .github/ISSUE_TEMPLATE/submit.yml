@@ -1,90 +1,26 @@
-name: Submit to Statlib
-description: Ask a question, raise a concern, recommend a reference, suggest a proof strategy, or propose a contribution.
-title: "[Submission] "
-labels: ["submission"]
+name: Submit a question
+description: Submit a question, reference, issue, or suggestion.
+title: "[Question] "
+labels: ["question"]
 body:
-  - type: markdown
+  - type: input
+    id: topic
     attributes:
-      value: |
-        ## Welcome
-
-         Use this form for anything you would like the community to see &mdash; it does not have to be polished. Some examples of what fits here:
-
-        - **Questioning a definition or its generality.** "Why is `X` stated only for finite measures? Could it be stated for `σ`-finite ones?"
-        - **Recommending a reference.** A textbook chapter, a paper, or a Mathlib file that handles a topic well.
-        - **Suggesting a proof strategy.** "I think the cleanest path to `Y` goes through the measurable-rectangle lemma in Mathlib."
-        - **Pointing to a related PR.** Either to Statlib, to Mathlib, or to another downstream library.
-        - **Asking a question** about an existing entry, definition, or proof.
-        - **Proposing a new definition or theorem** &mdash; sketches and informal drafts are welcome.
-
-  - type: dropdown
-    id: kind
-    attributes:
-      label: What is this submission?
-      description: Pick the closest match. If nothing fits, choose "Other" and describe below.
-      options:
-        - Question about an existing entry
-        - Concern about a definition or its generality
-        - Reference recommendation (textbook, paper, Mathlib)
-        - Proof strategy suggestion
-        - Related PR (Statlib / Mathlib / elsewhere)
-        - Proposal for a new definition, theorem, or note
-        - Ecosystem scan (data/scans/)
-        - Other
+      label: Topic
+      placeholder: e.g. sufficiency, KL divergence, conditional expectation
     validations:
       required: true
 
-  - type: dropdown
-    id: area
-    attributes:
-      label: Area
-      description: Roughly which subject does this touch?
-      options:
-        - Probability
-        - Statistics
-        - Information theory
-        - Stochastic methods / TCS
-        - Learning theory
-        - Randomized algorithms
-        - Quantum information
-        - Cross-cutting / not sure
-
-  - type: input
-    id: concept
-    attributes:
-      label: Concept, theorem, or page (if applicable)
-      description: The object your submission concerns, if there is one.
-      placeholder: e.g. Halmos–Savage sufficiency, KL divergence, Fano's inequality, contribute.html
-
   - type: textarea
-    id: body
+    id: question
     attributes:
-      label: Your submission
-      description: |
-        Write out what you want to say. LaTeX-style math is fine. A few prompts to get you started, depending on what you're submitting:
-
-        - **Question / concern:** What is unclear or potentially wrong? What is the right level of generality?
-        - **Reference:** Which book / paper / chapter / Mathlib file, and what does it cover well?
-        - **Proof strategy:** Sketch the argument or the key lemma you'd lean on.
-        - **PR:** Link to it and say what it does.
-        - **Proposal:** State the definition or theorem; informal drafts welcome.
-      placeholder: |
-        e.g. "The current statement of the Halmos–Savage theorem assumes a dominated family. I think it generalizes to σ-finite families via Mathlib's `Measure.haveLebesgueDecomposition`. Reference: Lehmann & Romano §2.6."
+      label: Question
+      placeholder: Write your question or suggestion here.
     validations:
       required: true
 
   - type: textarea
     id: links
     attributes:
-      label: Links (PRs, references, related issues)
-      description: Anything that helps the reviewer follow up &mdash; PR links, arXiv IDs, Mathlib declarations, related Statlib issues.
-      placeholder: |
-        - https://github.com/leanprover-community/mathlib4/pull/...
-        - arXiv:2401.xxxxx
-        - Mathlib: `MeasureTheory.RadonNikodym`
-
-  - type: textarea
-    id: notes
-    attributes:
-      label: Anything else
-      description: Optional. Design choices, sticky points, or context that doesn't fit above.
+      label: Links or references
+      placeholder: Optional links, references, or related declarations.
