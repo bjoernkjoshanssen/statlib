@@ -631,7 +631,6 @@ private lemma Lp.integrable_sqrt_rnDeriv_sub_sqrt_rnDeriv_sub_const_mul_mul_sqrt
 
 /-- **Mean zero score** for a Hadamard quadratic mean derivative. -/
 -- ANCHOR: integralScoreEqZero
--- ANCHOR: integralScoreEqZeroSig
 theorem integral_score_eq_zero {Ω E : Type*} {mΩ : MeasurableSpace Ω} [AddCommMonoid E]
     [Module ℝ E] [TopologicalSpace E] {P : E → Measure Ω} {μ : Measure Ω} [SigmaFinite μ]
     {s : Set E} {θ h : E} {A : E →ₗ[ℝ] (Ω →₂[P θ] ℝ)}

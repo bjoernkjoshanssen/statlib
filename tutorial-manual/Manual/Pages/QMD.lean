@@ -111,17 +111,6 @@ def HasHadamardQuadraticMeanDerivWithinAt {Ω E : Type*} {mΩ : MeasurableSpace 
 The Hadamard notion is genuinely weaker: a quadratic mean derivative within a set is
 always a Hadamard QMD derivative.
 
-```anchor qmdImpliesHadamard
-theorem HasQuadraticMeanDerivWithinAt.hasHadamardQuadraticMeanDerivWithinAt {Ω E : Type*}
-    {mΩ : MeasurableSpace Ω} [SeminormedAddCommGroup E] [NormedSpace ℝ E] {P : E → Measure Ω}
-    {μ : Measure Ω} [SigmaFinite μ] {s : Set E} {θ : E} {A : E →L[ℝ] (Ω →₂[P θ] ℝ)}
-    (hA : HasQuadraticMeanDerivWithinAt P μ s θ A) (hθ : θ ∈ s)
-    (hprob : ∀ x ∈ s, IsProbabilityMeasure (P x)) (hs : ∀ x ∈ s, P x ≪ μ) :
-    HasHadamardQuadraticMeanDerivWithinAt P μ s θ A :=
-  (hasHadamardQuadraticMeanDerivWithinAt_iff A hθ hprob hs).2
-    fun _ _ hzero hh he => hA.tendsto_local_path_remainder hzero hh he
-```
-
 # The mean-zero score theorem
 
 The central result, formalized as `integral_score_eq_zero`, is the following.
@@ -185,12 +174,15 @@ $$`\frac{T_2}{t}
 Since $`T_1/t + T_2/t = 0` for every $`t \neq 0`, taking the limit yields
 $`\mathbb{E}_{\mathbb{P}_{\theta^\star}}(A(h)) = 0`, as claimed.
 
-## The formalized proof
+## The formalized statement and proof
 
-The mean-zero score result is the theorem `integral_score_eq_zero`. We present the
-statement below.
+The mean-zero score result is the theorem `integral_score_eq_zero`, stated and proved
+in Lean below. The proof realizes the difference-of-squares argument above: the limits
+$`T_1/t \to 0` and $`T_2/t \to \mathbb{E}_{\mathbb{P}_{\theta^\star}}(A(h))` are the
+lemmas `tendsto_zero` and `tendsto_integral_score`, and uniqueness of limits pins the
+score integral to $`0`.
 
-```anchor integralScoreEqZeroSig
+```anchor integralScoreEqZero
 theorem integral_score_eq_zero {Ω E : Type*} {mΩ : MeasurableSpace Ω} [AddCommMonoid E]
     [Module ℝ E] [TopologicalSpace E] {P : E → Measure Ω} {μ : Measure Ω} [SigmaFinite μ]
     {s : Set E} {θ h : E} {A : E →ₗ[ℝ] (Ω →₂[P θ] ℝ)}
@@ -199,8 +191,61 @@ theorem integral_score_eq_zero {Ω E : Type*} {mΩ : MeasurableSpace Ω} [AddCom
     [l.NeBot] (hzero : Tendsto Prod.fst l (𝓝[≠] 0)) (hh : Tendsto Prod.snd l (𝓝 h))
     (he : ∀ᶠ p in l, θ + p.1 • p.2 ∈ s) :
     ∫ ω, A h ω ∂P θ = 0 := by
+  refine tendsto_nhds_unique (zero_add (∫ ω, A h ω ∂P θ) ▸
+    (tendsto_zero hA hθ hprob hs (tendsto_nhds_of_tendsto_nhdsWithin hzero) hh he).add
+    (tendsto_integral_score hA hθ hprob hs hzero hh he)) ?_
+  apply EventuallyEq.tendsto (EventuallyEq.symm ?_)
+  filter_upwards [he, (tendsto_nhdsWithin_iff.1 hzero).2] with p hp hn
+  have : IsProbabilityMeasure (P (θ + p.1 • p.2)) := hprob _ hp
+  have : IsProbabilityMeasure (P θ) := hprob _ hθ
+  calc
+    0 = p.1⁻¹ * 0 := by simp
+    _ = p.1⁻¹ * (∫ ω, (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal -
+          √((P θ).rnDeriv μ ω).toReal) * (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal +
+          √((P θ).rnDeriv μ ω).toReal) ∂μ) := by rw [integral_diff_sq_eq_zero (hs _ hp) (hs _ hθ)]
+    _ = p.1⁻¹ * (∫ ω, (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal -
+          √((P θ).rnDeriv μ ω).toReal - 2⁻¹ * A (p.1 • h) ω * √((P θ).rnDeriv μ ω).toReal +
+          2⁻¹ * A (p.1 • h) ω * √((P θ).rnDeriv μ ω).toReal) *
+          (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal +
+          √((P θ).rnDeriv μ ω).toReal) ∂μ) := by simp
+    _ = p.1⁻¹ * (∫ ω, (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal -
+          √((P θ).rnDeriv μ ω).toReal - 2⁻¹ * A (p.1 • h) ω * √((P θ).rnDeriv μ ω).toReal) *
+          (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal + √((P θ).rnDeriv μ ω).toReal) ∂μ +
+          ∫ ω, 2⁻¹ * A (p.1 • h) ω * √((P θ).rnDeriv μ ω).toReal *
+          (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal +
+          √((P θ).rnDeriv μ ω).toReal) ∂μ) := by
+        simp only [add_mul]
+        rw [integral_add]
+        · exact Lp.integrable_sqrt_rnDeriv_sub_sqrt_rnDeriv_sub_const_mul_mul_sqrt_rnDeriv_add
+            (hs _ hθ) 2⁻¹ (A (p.1 • h))
+        · simpa [mul_assoc] using (Lp.integrable_mul_sqrt_rnDeriv_mul_sqrt_rnDeriv_add _ (hs _ hθ)
+            (A (p.1 • h))).const_mul 2⁻¹
+    _ = p.1⁻¹ * (∫ ω, (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal -
+          √((P θ).rnDeriv μ ω).toReal - 2⁻¹ * A (p.1 • h) ω * √((P θ).rnDeriv μ ω).toReal) *
+          (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal + √((P θ).rnDeriv μ ω).toReal) ∂μ) +
+          p.1⁻¹ * (∫ ω, 2⁻¹ * A (p.1 • h) ω * √((P θ).rnDeriv μ ω).toReal *
+          (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal +
+          √((P θ).rnDeriv μ ω).toReal) ∂μ) := by simp [mul_add]
+    _ = p.1⁻¹ * (∫ ω, (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal -
+          √((P θ).rnDeriv μ ω).toReal - 2⁻¹ * A (p.1 • h) ω * √((P θ).rnDeriv μ ω).toReal) *
+          (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal + √((P θ).rnDeriv μ ω).toReal) ∂μ) +
+          p.1⁻¹ * (∫ ω, 2⁻¹ * p.1 * A h ω * √((P θ).rnDeriv μ ω).toReal *
+          (√((P (θ + p.1 • p.2)).rnDeriv μ ω).toReal +
+          √((P θ).rnDeriv μ ω).toReal) ∂μ) := by
+        simp only [map_smul, add_right_inj, mul_eq_mul_left_iff, inv_eq_zero,
+          fun ω => mul_assoc 2⁻¹ ((p.1 • A h) ω) (√((P θ).rnDeriv μ ω).toReal),
+          fun ω => mul_assoc 2⁻¹  p.1 (A h ω),
+          fun ω => mul_assoc 2⁻¹ (p.1 * A h ω) (√((P θ).rnDeriv μ ω).toReal)]
+        refine Or.inl (integral_congr_ae ?_)
+        filter_upwards [Measure.rnDeriv_eq_zero_of_ae_eq (hs _ hθ) (Lp.coeFn_smul p.1 (A h))] with
+          ω hω
+        by_cases! hne : (p.1 • A h) ω ≠ (p.1 • (A h : Ω → ℝ)) ω
+        · simp [hω hne]
+        · rw [hne]
+          simp [Pi.smul_apply, smul_eq_mul]
+    _ = _ := by
+        simp only [map_smul, mul_comm 2⁻¹ p.1, add_right_inj, mul_assoc]
+        rw [integral_const_mul_of_integrable (c := p.1), inv_mul_cancel_left₀ hn]
+        simpa [mul_assoc] using (Lp.integrable_mul_sqrt_rnDeriv_mul_sqrt_rnDeriv_add _ (hs _ hθ)
+          (A h)).const_mul 2⁻¹
 ```
-
-The proof follows the difference-of-squares argument above: the limits $`T_1/t \to 0`
-and $`T_2/t \to \mathbb{E}_{\mathbb{P}_{\theta^\star}}(A(h))` are the lemmas `tendsto_zero`
-and `tendsto_integral_score`, and uniqueness of limits pins the score integral to $`0`.
