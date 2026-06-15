@@ -17,33 +17,19 @@ public import Mathlib.MeasureTheory.Measure.Decomposition.Lebesgue
 /-!
 # Concrete Neyman-Pearson
 
--/
-
-@[expose] public section
-
-open scoped ENNReal Topology
-
-open MeasureTheory ProbabilityTheory Filter
-
-
-
-open MeasureTheory ProbabilityTheory Real Set Filter
-open scoped ENNReal BigOperators
-
-open MeasureTheory
-
-/-! In this file we write `ρ(x∣θ)` as `ρ θ x`.
+In this file we write `ρ(x∣θ)` as `ρ θ x`.
 
 The Neyman-Pearson lemma is proved over `ℝ` in `NP` below.
 We also include some work towards a `ℝ≥0∞` version,
 to allow Radon-Nikodym generalization. We follow the Wikipedia
 argument.
- -/
+-/
 
-noncomputable section
+@[expose] public noncomputable section
 
+open MeasureTheory ProbabilityTheory Real Set Filter Classical
+open scoped ENNReal BigOperators Topology
 
-open Classical
 
 /-- The Neyman-Pearson region. -/
 def RNP (θ₀ θ₁ η : ℝ) (ρ : ℝ → ℝ → ℝ) : Set ℝ :=
