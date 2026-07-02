@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Bjørn Kjos-Hanssen. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Bjørn Kjos-Hanssen
+-/
 import Mathlib
 
 /-!
@@ -30,23 +35,26 @@ lemma tw_scalar_identity (μ φ p : ℝ) (hμ : 0 < μ) (hφ : 0 < φ) (hp₁ : 
           / (φ ^ ((j : ℝ) * (1 - (2 - p) / (1 - p))) * (2 - p) ^ j) := by
   -- Rewrite the left-hand side with positive bases
   have lhs_rewrite :
-      (μ ^ (2 - p) / (φ * (2 - p))) ^ j * (μ ^ (1 - p) / (φ * (p - 1))) ^ (j * ((2 - p) / (p - 1))) =
-        (μ ^ ((2 - p) * j) * φ ^ (-(j : ℝ)) * (2 - p) ^ (-(j : ℝ))) * (μ ^ ((1 - p) * (j * ((2 - p) / (p - 1)))) * φ ^ (-(j * ((2 - p) / (p - 1))) : ℝ) * (p - 1) ^ (-(j * ((2 - p) / (p - 1))) : ℝ)) := by
-          congr 1;
-          · rw [ Real.rpow_mul ( by positivity ), Real.rpow_neg ( by linarith ), Real.rpow_neg ( by linarith ) ]
-            ring_nf
-            norm_cast ; norm_num
-            ring_nf
-            rw [ show - ( p * φ ) + φ * 2 = φ * ( 2 - p ) by ring, mul_inv ] ; ring;
-          · rw [ Real.div_rpow ( by positivity ) ( by exact mul_nonneg hφ.le ( by linarith ) ) ];
-            rw [ ← Real.rpow_mul ( by positivity ), Real.mul_rpow ( by positivity ) ( by linarith ), Real.rpow_neg ( by linarith ), Real.rpow_neg ( by linarith ) ] ; ring;
-  convert lhs_rewrite using 1 ; norm_num [ Real.rpow_def_of_pos, * ]
+      (μ ^ (2 - p) / (φ * (2 - p))) ^ j * (μ ^ (1 - p) / (φ * (p - 1))) ^ (j * ((2 - p) / (p - 1)))
+      = (μ ^ ((2 - p) * j) * φ ^ (-(j : ℝ)) * (2 - p) ^ (-(j : ℝ))) * (μ ^ ((1 - p) * (j * ((2 - p)
+      / (p - 1)))) * φ ^ (-(j * ((2 - p) / (p - 1))) : ℝ)
+      * (p - 1) ^ (-(j * ((2 - p) / (p - 1))) : ℝ)) := by
+    congr 1;
+    · rw [Real.rpow_mul (by positivity), Real.rpow_neg (by linarith), Real.rpow_neg (by linarith)]
+      ring_nf
+      norm_cast; norm_num
+      ring_nf
+      rw [show - ( p * φ) + φ * 2 = φ * ( 2 - p) by ring, mul_inv]; ring;
+    · rw [Real.div_rpow (by positivity) (mul_nonneg hφ.le (by linarith))];
+      rw [← Real.rpow_mul (by positivity), Real.mul_rpow (by positivity) (by linarith),
+        Real.rpow_neg (by linarith), Real.rpow_neg (by linarith)]; ring;
+  convert lhs_rewrite using 1; norm_num [Real.rpow_def_of_pos, *]
   ring_nf
-  rw [ ← Real.exp_neg, ← Real.exp_add ]
+  rw [← Real.exp_neg, ← Real.exp_add]
   ring_nf
-  rw [ ← Real.exp_log ( by linarith : 0 < 2 - p ) ] ; norm_num [ ← Real.exp_add, ← Real.exp_nat_mul ]
+  rw [← Real.exp_log (by linarith : 0 < 2 - p)]; norm_num [← Real.exp_add, ← Real.exp_nat_mul]
   ring_nf
-  rw [ ← Real.exp_neg, ← Real.exp_add ]
+  rw [← Real.exp_neg, ← Real.exp_add]
   ring_nf
   grind
 
